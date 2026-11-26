@@ -19,7 +19,7 @@ public enum Estado {
     }
 
     /**
-     * Devuelve el estado tal y como se escribe en el archivo.
+     * Devuelve el estado tal y como se guarda en la base de datos y en el CSV.
      *
      * @return el texto del estado, por ejemplo "pendiente"
      */
@@ -28,10 +28,9 @@ public enum Estado {
     }
 
     /**
-     * Busca el estado a partir del texto que escribe el usuario.
-     * Da igual si viene en mayusculas o minusculas.
+     * Busca el estado a partir de un texto. Da igual si viene en mayusculas o minusculas.
      *
-     * @param texto lo que ha escrito el usuario
+     * @param texto el texto del estado
      * @return el estado que corresponde
      * @throws IllegalArgumentException si el texto no es ningun estado
      */
@@ -44,11 +43,21 @@ public enum Estado {
     }
 
     /**
-     * Lista de estados separada por comas, para los mensajes de error y la ayuda.
+     * Lista de estados separada por comas, para los mensajes de error.
      *
      * @return por ejemplo "pendiente, entrevista, rechazado, aceptado"
      */
     public static String textosPermitidos() {
         return Arrays.stream(values()).map(Estado::texto).collect(Collectors.joining(", "));
+    }
+
+    /**
+     * Texto que se ve en la interfaz, con la primera letra en mayuscula.
+     *
+     * @return por ejemplo "Pendiente"
+     */
+    @Override
+    public String toString() {
+        return Character.toUpperCase(texto.charAt(0)) + texto.substring(1);
     }
 }
