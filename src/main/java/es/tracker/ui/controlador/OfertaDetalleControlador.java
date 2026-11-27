@@ -1,23 +1,37 @@
 package es.tracker.ui.controlador;
 
 import es.tracker.modelo.Empresa;
+import es.tracker.modelo.Entrevista;
 import es.tracker.modelo.Oferta;
+import es.tracker.modelo.ResultadoEntrevista;
+import es.tracker.modelo.TipoEntrevista;
 import es.tracker.ui.Dialogos;
 import es.tracker.ui.Formatos;
 import es.tracker.ui.Navegador;
 import es.tracker.ui.Servicios;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TitledPane;
 
+import java.time.LocalDate;
+import java.util.List;
 
 /**
- * Pantalla de detalle de una candidatura: sus datos y los de su empresa.
+ * Pantalla de detalle de una candidatura: sus datos, la empresa y sus entrevistas
+ * en un panel desplegable.
  */
 public class OfertaDetalleControlador {
 
     private final Servicios servicios;
     private final Navegador navegador;
+    private final ObservableList<Entrevista> entrevistas = FXCollections.observableArrayList();
     private Oferta oferta;
 
     @FXML
@@ -48,6 +62,17 @@ public class OfertaDetalleControlador {
     private Hyperlink lnkWeb;
     @FXML
     private Label lblRegistrada;
+    @FXML
+    private TitledPane panelEntrevistas;
+    @FXML
+    private TableView<Entrevista> tblEntrevistas;
+    @FXML
+    private TableColumn<Entrevista, LocalDate> colEntFecha;
+    @FXML
+    private TableColumn<Entrevista, TipoEntrevista> colEntTipo;
+    @FXML
+    private TableColumn<Entrevista, ResultadoEntrevista> colEntResultado;
+
     /**
      * Crea el controlador. Lo llama el Navegador al cargar el FXML.
      *
@@ -57,6 +82,23 @@ public class OfertaDetalleControlador {
     public OfertaDetalleControlador(Servicios servicios, Navegador navegador) {
         this.servicios = servicios;
         this.navegador = navegador;
+    }
+
+    @FXML
+    private void initialize() {
+        colEntFecha.setCellValueFactory(celda -> new ReadOnlyObjectWrapper<>(celda.getValue().fecha()));
+        colEntFecha.setCellFactory(columna -> new TableCell<>() {
+            @Override
+            protected void updateItem(LocalDate fecha, boolean vacia) {
+                super.updateItem(fecha, vacia);
+                setText(vacia ? null : Formatos.fecha(fecha));
+            }
+        });
+        colEntTipo.setCellValueFactory(celda -> new ReadOnlyObjectWrapper<>(celda.getValue().tipo()));
+        colEntResultado.setCellValueFactory(celda -> new ReadOnlyObjectWrapper<>(celda.getValue().resultado()));
+        colEntResultado.setCellFactory(columna -> new CeldaResultado<>());
+        tblEntrevistas.setItems(entrevistas);
+        tblEntrevistas.setPlaceholder(new Label("Todavía no hay entrevistas."));
     }
 
     /**
@@ -88,6 +130,17 @@ public class OfertaDetalleControlador {
         lblSector.setText(empresa.sector());
         mostrarEnlace(lnkWeb, empresa.web());
         lblRegistrada.setText(Formatos.fecha(empresa.fechaRegistro()));
+        cargarEntrevistas();
+    }
+
+    private void cargarEntrevistas() {
+        try {
+            List<Entrevista> deLaOferta = servicios.entrevistas().deOferta(oferta.id());
+            entrevistas.setAll(deLaOferta);
+            panelEntrevistas.setText("Entrevistas (" + deLaOferta.size() + ")");
+        } catch (RuntimeException e) {
+            Dialogos.error("No se han podido cargar las entrevistas", e.getMessage());
+        }
     }
 
     private static void mostrarEnlace(Hyperlink enlace, String url) {
@@ -109,7 +162,7 @@ public class OfertaDetalleControlador {
     @FXML
     private void onBorrar() {
         if (!Dialogos.confirmar("Borrar candidatura", "¿Seguro que quieres borrar «" + oferta.titulo()
-                + "»? También se borrarán sus entrevistas.")) {
+                + "»? También se borrarán sus " + entrevistas.size() + " entrevistas.")) {
             return;
         }
         try {

@@ -4,6 +4,9 @@
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -100,6 +103,24 @@
                                     </children>
                                 </VBox>
 
+                                <TitledPane fx:id="panelEntrevistas" animated="false" text="Entrevistas">
+                                    <content>
+                                        <VBox spacing="10.0">
+                                            <children>
+                                                <TableView fx:id="tblEntrevistas" prefHeight="220.0">
+                                                    <columns>
+                                                        <TableColumn fx:id="colEntFecha" prefWidth="95.0" styleClass="ids-fechas" text="Fecha"/>
+                                                        <TableColumn fx:id="colEntTipo" prefWidth="100.0" text="Tipo"/>
+                                                        <TableColumn fx:id="colEntResultado" prefWidth="110.0" text="Resultado"/>
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </TitledPane>
                             </children>
                         </VBox>
                     </children>
