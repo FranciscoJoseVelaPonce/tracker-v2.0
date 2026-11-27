@@ -11,53 +11,45 @@
 
 **Tracker de Candidaturas Laborales**: aplicación Java para hacer seguimiento de candidaturas a ofertas de empleo (ejercicio integrador del 1er trimestre, Acceso a Datos + Desarrollo de Interfaces).
 
-Entrega actual: **v1.0 (Archivos + CLI + Diseño)**. Solo se hace hasta la v1.0: **nada de base de datos, JavaFX ni Hibernate**.
+Entrega actual: **v2.0 (JDBC + JavaFX)**. La v1.0 (archivos + CLI) está cerrada en el tag `v1.0`. En esta entrega **nada de Hibernate, JPA ni Ollama**: eso es de la v3.0.
 
-## Reglas obligatorias de la v1.0
+## Reglas obligatorias de la v2.0
 
 1. Java 24 o superior, gestionado con Maven.
-2. Interfaz **solo por línea de comandos**: el programa recibe la operación y sus parámetros en `main(String[] args)`.
-3. **Prohibido** usar `Scanner`, `System.in` o menús interactivos.
-4. Cada ejecución realiza **una operación y termina**.
-5. Persistencia en **un archivo de texto plano** (`candidaturas.csv`). Sin base de datos.
-6. Los errores se muestran con un **mensaje claro por consola**. El programa nunca termina con un stack trace.
+2. Persistencia en **MySQL con JDBC**: `Connection`, `PreparedStatement` y `ResultSet`, siempre con `try-with-resources`.
+3. Nunca se concatenan valores en el SQL: siempre parámetros `?`.
+4. Tablas `empresa`, `oferta` y `entrevista`, creadas con `schema.sql`.
+5. Las operaciones que tocan varias tablas van en una **transacción** (`setAutoCommit(false)`, `commit`, `rollback`).
+6. La configuración de la conexión está **fuera del código**: `config.properties` o variables de entorno.
+7. Interfaz en **JavaFX**. Todas las pantallas se maquetan en **Scene Builder** (`.fxml`); en Java solo van los eventos, la carga de datos, las celdas de las tablas y la validación.
+8. Los controladores **solo hablan con los servicios**, nunca con los repositorios ni con JDBC.
+9. Los errores se muestran con un mensaje claro (`Alert` o una etiqueta en el formulario). La aplicación nunca se cierra con un error ni enseña trazas.
 
-## Operaciones (comandos)
-
-| Comando | Qué hace |
-|---|---|
-| `-listar` | Lista todas las candidaturas |
-| `-listar --estado X --empresa Y` | Filtra por estado y/o empresa (texto) |
-| `-añadir --titulo X --empresa Y --estado Z --fecha dd/MM/yyyy` | Añade una candidatura al archivo |
-| `-ver 13` | Muestra todos los detalles de la candidatura con ID 13 |
-| `-borrar 13` | Elimina la candidatura con ID 13 |
-| `-importar candidaturas.csv` | Importa candidaturas desde otro archivo CSV |
-
-## Formato de datos
+## Modelo de datos
 
 ```
-id;titulo;empresa;estado;fechaPostulacion;enlace;notas
-1;Desarrollador Java Junior;Indra;pendiente;02/08/2026;https://...;Enviado por InfoJobs
+EMPRESA    (id, nombre, sector, web, fecha_registro)
+OFERTA     (id, id_empresa FK, titulo, descripcion, estado, fecha_postulacion, enlace, salario, notas)
+ENTREVISTA (id, id_oferta FK, fecha, tipo, notas, resultado)
 ```
 
-- Primera línea: cabecera.
-- Fechas `dd/MM/yyyy` con `LocalDate` y `DateTimeFormatter`.
-- Estados: `pendiente`, `entrevista`, `rechazado`, `aceptado` (enum `Estado`).
-- `enlace` y `notas` son opcionales.
-- Codificación UTF-8.
+- Estados de una candidatura: `pendiente`, `entrevista`, `rechazado`, `aceptado` (enum `Estado`).
+- Tipos de entrevista: `telefónica`, `técnica`, `presencial`, `online` (enum `TipoEntrevista`).
+- Resultados: `pendiente`, `positivo`, `negativo` (enum `ResultadoEntrevista`).
+- Fechas con `LocalDate`, en pantalla como `dd/MM/yyyy`.
+- `salario` es opcional: `null` en Java y `NULL` en la base de datos, nunca 0.
 
 ## Estructura de paquetes
 
 ```
 src/main/java/es/tracker/
-  modelo/        Oferta, Estado
-  repositorio/   RepositorioOfertas (interfaz) y RepositorioOfertasArchivo
-  servicio/      OfertaService
-  cli/           Cli
-  Main.java
+  modelo/          records y enums del dominio
+  config/          ConfiguracionBD, FabricaConexiones, InicializadorBD
+  repositorio/     interfaces + implementaciones JDBC + lector del CSV
+  servicio/        OfertaService, EmpresaService, EntrevistaService
+  ui/              AppTracker, Launcher, Navegador, Dialogos, Formatos
+  ui/controlador/  un controlador por pantalla
 ```
-
-El `Main` solo arranca; los argumentos y la salida van en `cli`; las reglas en `servicio`; el archivo solo en `repositorio`.
 
 ## Calidad del código
 
@@ -65,21 +57,19 @@ El `Main` solo arranca; los argumentos y la salida van en `cli`; las reglas en `
 - Nombres en **español**.
 - **Javadoc** en clases y métodos públicos, escrito de forma sencilla. **Ningún otro comentario.**
 - Sin código duplicado.
-- `try-with-resources` y `java.nio.file` con `StandardCharsets.UTF_8`.
-- Capturar las excepciones donde se pueda dar un mensaje útil; no tragárselas.
+- `PersistenciaException` envuelve las `SQLException` para que la interfaz no dependa de JDBC.
 
 ## Pruebas
 
-- JUnit 5. El servicio se prueba con un repositorio en memoria hecho dentro del test.
-- Cubrir la lógica del servicio (filtrar, añadir, ver, borrar, importar, validaciones).
-- Repositorio con archivos temporales (`@TempDir`), nunca con el archivo real.
+- JUnit 5 y Mockito para los servicios (repositorios simulados).
+- Repositorios JDBC probados con **H2 en memoria** en modo MySQL, cargando el mismo `schema.sql`. Nunca contra la base de datos real.
 
 ## Control de versiones
 
 - Un único repositorio en GitHub; los dos miembros son colaboradores.
 - Commits pequeños, uno por cada parte terminada, con mensajes descriptivos en español.
-- La hora de los commits es la real. No se reescribe el historial.
-- La entrega se etiqueta en `main` como `v1.0`.
+- Cada uno hace sus commits con su cuenta. No se reescribe el historial.
+- La entrega se etiqueta en `main` como `v2.0`.
 
 ## Cómo debe trabajar la IA en este repositorio
 
