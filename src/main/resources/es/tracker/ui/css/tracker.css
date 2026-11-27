@@ -1,0 +1,258 @@
+.root {
+    -color-primario: #2B4ACB;
+    -color-primario-claro: #E6EAFA;
+    -color-secundario: #0E7C86;
+    -color-texto: #1B1F2A;
+    -color-texto-suave: #4A5162;
+    -color-fondo: #F5F6FA;
+    -color-superficie: #FFFFFF;
+    -color-borde: #D5D9E2;
+    -color-error: #B42318;
+    -fx-font-family: "Inter", "Segoe UI", "Helvetica Neue", sans-serif;
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-texto;
+    -fx-background-color: -color-fondo;
+}
+
+.menu-lateral {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: transparent -color-borde transparent transparent;
+    -fx-padding: 20 14 20 14;
+    -fx-spacing: 6;
+}
+
+.logo {
+    -fx-font-family: "Lexend", "Segoe UI Semibold", sans-serif;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+    -fx-padding: 0 0 16 4;
+}
+
+.boton-menu {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-texto-suave;
+    -fx-alignment: center-left;
+    -fx-padding: 9 12 9 12;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.boton-menu:hover {
+    -fx-background-color: -color-fondo;
+}
+
+.boton-menu:selected {
+    -fx-background-color: -color-primario-claro;
+    -fx-text-fill: -color-primario;
+    -fx-font-weight: bold;
+}
+
+.pantalla {
+    -fx-padding: 28 32 28 32;
+    -fx-spacing: 18;
+}
+
+.titulo-pantalla {
+    -fx-font-family: "Lexend", "Segoe UI Semibold", sans-serif;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.subtitulo {
+    -fx-text-fill: -color-texto-suave;
+}
+
+.tarjeta {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 16 18 16 18;
+}
+
+.titulo-tarjeta {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.etiqueta-campo {
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.etiqueta-dato {
+    -fx-text-fill: -color-texto-suave;
+}
+
+.valor-dato {
+    -fx-font-weight: bold;
+}
+
+.button {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+}
+
+.button.primario {
+    -fx-background-color: -color-primario;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.button.primario:hover {
+    -fx-background-color: derive(-color-primario, -12%);
+}
+
+.button.secundario {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-primario;
+    -fx-text-fill: -color-primario;
+    -fx-font-weight: bold;
+}
+
+.button.peligro {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-error;
+    -fx-text-fill: -color-error;
+}
+
+.button:focused {
+    -fx-border-color: -color-texto;
+    -fx-border-width: 2;
+}
+
+.button:disabled {
+    -fx-opacity: 0.45;
+}
+
+.text-field, .text-area, .combo-box, .date-picker {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+
+.campo-error, .campo-error .text-field {
+    -fx-border-color: -color-error;
+    -fx-border-width: 2;
+}
+
+.texto-error {
+    -fx-text-fill: -color-error;
+    -fx-font-weight: bold;
+}
+
+.nota-pie {
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-texto-suave;
+}
+
+.table-view {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: -color-fondo;
+    -fx-background-radius: 10 10 0 0;
+}
+
+.table-view .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto-suave;
+    -fx-alignment: center-left;
+}
+
+.table-row-cell {
+    -fx-cell-size: 40px;
+    -fx-border-color: transparent transparent -color-borde transparent;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: -color-primario-claro;
+}
+
+.table-row-cell:selected .text {
+    -fx-fill: -color-texto;
+}
+
+.insignia {
+    -fx-padding: 3 10 3 10;
+    -fx-background-radius: 12;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.estado-pendiente, .resultado-pendiente {
+    -fx-background-color: #FFF1CC;
+    -fx-text-fill: #8A5A00;
+}
+
+.estado-entrevista {
+    -fx-background-color: #E0E8FB;
+    -fx-text-fill: #1D4ED8;
+}
+
+.estado-rechazado, .resultado-negativo {
+    -fx-background-color: #FDE7E5;
+    -fx-text-fill: #B42318;
+}
+
+.estado-aceptado, .resultado-positivo {
+    -fx-background-color: #E3F4EA;
+    -fx-text-fill: #1F7A45;
+}
+
+.combo-estado {
+    -fx-background-radius: 12;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 130px;
+}
+
+.combo-estado.estado-pendiente .list-cell {
+    -fx-text-fill: #8A5A00;
+}
+
+.combo-estado.estado-entrevista .list-cell {
+    -fx-text-fill: #1D4ED8;
+}
+
+.combo-estado.estado-rechazado .list-cell {
+    -fx-text-fill: #B42318;
+}
+
+.combo-estado.estado-aceptado .list-cell {
+    -fx-text-fill: #1F7A45;
+}
+
+.titled-pane > .title {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde;
+    -fx-font-weight: bold;
+    -fx-padding: 10 14 10 14;
+}
+
+.titled-pane > .content {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde;
+    -fx-padding: 12;
+}
+
+.scroll-pane, .scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.hyperlink {
+    -fx-text-fill: -color-primario;
+    -fx-padding: 0;
+}
+
+.ids-fechas {
+    -fx-font-family: "JetBrains Mono", "Consolas", monospace;
+}
