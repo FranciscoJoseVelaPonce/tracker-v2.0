@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="es.tracker.ui.controlador.LayoutControlador">
+    <fx:define>
+        <ToggleGroup fx:id="grupoMenu"/>
+    </fx:define>
+    <left>
+        <VBox prefWidth="210.0" styleClass="menu-lateral">
+            <children>
+                <Label styleClass="logo" text="Tracker"/>
+                <ToggleButton fx:id="btnCandidaturas" maxWidth="Infinity" mnemonicParsing="true" onAction="#onCandidaturas"
+                              selected="true" styleClass="boton-menu" text="_Candidaturas" toggleGroup="$grupoMenu">
+                    <tooltip>
+                        <Tooltip text="Listado de candidaturas (Alt+C)"/>
+                    </tooltip>
+                </ToggleButton>
+                <ToggleButton fx:id="btnEmpresas" maxWidth="Infinity" mnemonicParsing="true" onAction="#onEmpresas"
+                              styleClass="boton-menu" text="_Empresas" toggleGroup="$grupoMenu">
+                    <tooltip>
+                        <Tooltip text="Gestión de empresas (Alt+E)"/>
+                    </tooltip>
+                </ToggleButton>
+                <ToggleButton fx:id="btnEntrevistas" maxWidth="Infinity" mnemonicParsing="true" onAction="#onEntrevistas"
+                              styleClass="boton-menu" text="E_ntrevistas" toggleGroup="$grupoMenu">
+                    <tooltip>
+                        <Tooltip text="Gestión de entrevistas (Alt+N)"/>
+                    </tooltip>
+                </ToggleButton>
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <StackPane fx:id="zonaCentral"/>
+    </center>
+</BorderPane>
