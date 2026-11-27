@@ -13,6 +13,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -72,6 +73,10 @@ public class OfertaDetalleControlador {
     private TableColumn<Entrevista, TipoEntrevista> colEntTipo;
     @FXML
     private TableColumn<Entrevista, ResultadoEntrevista> colEntResultado;
+    @FXML
+    private Button btnEditarEntrevista;
+    @FXML
+    private Button btnBorrarEntrevista;
 
     /**
      * Crea el controlador. Lo llama el Navegador al cargar el FXML.
@@ -99,6 +104,10 @@ public class OfertaDetalleControlador {
         colEntResultado.setCellFactory(columna -> new CeldaResultado<>());
         tblEntrevistas.setItems(entrevistas);
         tblEntrevistas.setPlaceholder(new Label("Todavía no hay entrevistas."));
+
+        var nadaSeleccionado = tblEntrevistas.getSelectionModel().selectedItemProperty().isNull();
+        btnEditarEntrevista.disableProperty().bind(nadaSeleccionado);
+        btnBorrarEntrevista.disableProperty().bind(nadaSeleccionado);
     }
 
     /**
@@ -181,5 +190,40 @@ public class OfertaDetalleControlador {
     @FXML
     private void onAbrirWeb() {
         navegador.abrirEnlace(oferta.empresa().web());
+    }
+
+    @FXML
+    private void onAnadirEntrevista() {
+        abrirDialogoEntrevista(null);
+    }
+
+    @FXML
+    private void onEditarEntrevista() {
+        abrirDialogoEntrevista(tblEntrevistas.getSelectionModel().getSelectedItem());
+    }
+
+    @FXML
+    private void onBorrarEntrevista() {
+        Entrevista entrevista = tblEntrevistas.getSelectionModel().getSelectedItem();
+        if (!Dialogos.confirmar("Borrar entrevista", "¿Seguro que quieres borrar la entrevista del "
+                + Formatos.fecha(entrevista.fecha()) + "?")) {
+            return;
+        }
+        try {
+            servicios.entrevistas().borrar(entrevista.id());
+            cargarEntrevistas();
+        } catch (RuntimeException e) {
+            Dialogos.error("No se ha podido borrar la entrevista", e.getMessage());
+        }
+    }
+
+    private void abrirDialogoEntrevista(Entrevista entrevista) {
+        EntrevistaDialogoControlador dialogo = navegador.abrirDialogo("entrevista-dialogo.fxml",
+                entrevista == null ? "Nueva entrevista" : "Editar entrevista",
+                tblEntrevistas.getScene().getWindow(),
+                controlador -> controlador.preparar(oferta, entrevista));
+        if (dialogo.isGuardada()) {
+            cargarEntrevistas();
+        }
     }
 }

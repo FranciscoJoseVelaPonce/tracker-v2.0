@@ -117,6 +117,13 @@
                                                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                                                     </columnResizePolicy>
                                                 </TableView>
+                                                <HBox spacing="8.0">
+                                                    <children>
+                                                        <Button mnemonicParsing="false" onAction="#onAnadirEntrevista" styleClass="secundario" text="+ Añadir"/>
+                                                        <Button fx:id="btnEditarEntrevista" mnemonicParsing="false" onAction="#onEditarEntrevista" styleClass="secundario" text="Editar"/>
+                                                        <Button fx:id="btnBorrarEntrevista" mnemonicParsing="false" onAction="#onBorrarEntrevista" styleClass="peligro" text="Borrar"/>
+                                                    </children>
+                                                </HBox>
                                             </children>
                                         </VBox>
                                     </content>
