@@ -4,6 +4,7 @@ import es.tracker.modelo.Estado;
 import es.tracker.modelo.FiltroOferta;
 import es.tracker.modelo.Oferta;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,4 +62,14 @@ public interface RepositorioOfertas {
      * @return true si se ha borrado, false si no existia
      */
     boolean borrar(int id);
+
+    /**
+     * Guarda las filas leidas de un CSV en una transaccion: si la empresa de una fila
+     * no existe se crea con el sector "Sin especificar". Si algo falla no se guarda nada.
+     *
+     * @param filas las candidaturas leidas del CSV
+     * @param hoy   fecha de registro de las empresas que se creen
+     * @return cuantas empresas nuevas se han creado
+     */
+    int importar(List<FilaCsv> filas, LocalDate hoy);
 }

@@ -1,6 +1,7 @@
 package es.tracker.repositorio;
 
 import es.tracker.config.FabricaConexiones;
+import es.tracker.modelo.Empresa;
 import es.tracker.modelo.Estado;
 import es.tracker.modelo.FiltroOferta;
 import es.tracker.modelo.Oferta;
@@ -10,9 +11,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -20,6 +24,9 @@ import java.util.Optional;
  * JOIN con empresa para devolver cada candidatura con su empresa.
  */
 public class RepositorioOfertasJdbc implements RepositorioOfertas {
+
+    /** Sector que se pone a las empresas que se crean al importar el CSV. */
+    public static final String SECTOR_DESCONOCIDO = "Sin especificar";
 
     private final FabricaConexiones fabrica;
 
@@ -158,6 +165,41 @@ public class RepositorioOfertasJdbc implements RepositorioOfertas {
         }
     }
 
+    @Override
+    public int importar(List<FilaCsv> filas, LocalDate hoy) {
+        try (Connection conexion = fabrica.abrir()) {
+            conexion.setAutoCommit(false);
+            try {
+                Map<String, Empresa> empresas = new HashMap<>();
+                int creadas = 0;
+                for (FilaCsv fila : filas) {
+                    String clave = fila.nombreEmpresa().toLowerCase(Locale.ROOT);
+                    Empresa empresa = empresas.get(clave);
+                    if (empresa == null) {
+                        Optional<Empresa> existente = buscarEmpresaPorNombre(conexion, fila.nombreEmpresa());
+                        if (existente.isPresent()) {
+                            empresa = existente.get();
+                        } else {
+                            empresa = RepositorioEmpresasJdbc.insertar(conexion,
+                                    new Empresa(null, fila.nombreEmpresa(), SECTOR_DESCONOCIDO, null, hoy));
+                            creadas++;
+                        }
+                        empresas.put(clave, empresa);
+                    }
+                    insertar(conexion, new Oferta(null, fila.titulo(), empresa, fila.estado(),
+                            fila.fechaPostulacion(), fila.enlace(), null, null, fila.notas()));
+                }
+                conexion.commit();
+                return creadas;
+            } catch (SQLException e) {
+                conexion.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            throw new PersistenciaException("No se ha podido importar el CSV. No se ha guardado ninguna candidatura.", e);
+        }
+    }
+
     private static Oferta insertar(Connection conexion, Oferta oferta) throws SQLException {
         String sql = "INSERT INTO oferta (id_empresa, titulo, descripcion, estado, fecha_postulacion, enlace, salario, notas) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -165,6 +207,16 @@ public class RepositorioOfertasJdbc implements RepositorioOfertas {
             rellenar(sentencia, oferta);
             sentencia.executeUpdate();
             return oferta.conId(MapeadorJdbc.idGenerado(sentencia));
+        }
+    }
+
+    private static Optional<Empresa> buscarEmpresaPorNombre(Connection conexion, String nombre) throws SQLException {
+        String sql = "SELECT " + MapeadorJdbc.COLUMNAS_EMPRESA + " FROM empresa e WHERE LOWER(e.nombre) = LOWER(?)";
+        try (PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+            sentencia.setString(1, nombre);
+            try (ResultSet filas = sentencia.executeQuery()) {
+                return filas.next() ? Optional.of(MapeadorJdbc.empresa(filas)) : Optional.empty();
+            }
         }
     }
 
